@@ -10,7 +10,21 @@ const builtin = @import("builtin");
 pub const Library = enum { SDL2, SDL2_ttf };
 
 pub fn build(b: *std.Build) !void {
-    const sdk = Sdk.init(b, .{ .dep_name = null });
+    const sdl_config_path = std.fs.path.join(
+        b.allocator,
+        &[_][]const u8{ b.pathFromRoot("../../.build_config"), "sdl.json" },
+    ) catch @panic("out of memory");
+
+    const sdl_ttf_config_path = std.fs.path.join(
+        b.allocator,
+        &[_][]const u8{ b.pathFromRoot("../../.build_config"), "sdl_ttf.json" },
+    ) catch @panic("out of memory");
+
+    const sdk = Sdk.init(b, .{
+        .dep_name = null,
+        .maybe_config_path = sdl_config_path,
+        .maybe_sdl_ttf_config_path = sdl_ttf_config_path,
+    });
 
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
